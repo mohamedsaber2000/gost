@@ -1,0 +1,112 @@
+<html>
+    <head>
+        <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-firestore.js"></script>  
+        <script src="jquery-3.3.1.js" type="text/javascript">
+        </script>
+        <link href="https://fonts.googleapis.com/css?family=Cairo|Roboto" rel="stylesheet"
+        type="text/css" />
+        <style>
+		 #message-container {
+                overflow-y: scroll;
+                max-height: 970px;
+                min-height: 970px;
+            }
+            .message {
+                margin-bottom: 20px;
+            }
+            .message-inner {
+                display: flex;
+                align-items: center;
+            }
+            .right-side {
+                width: 100%;
+                margin-left: 5px;
+            }
+			
+            .message {
+                margin-bottom: 20px;
+				display: flex;
+            }
+   
+		#chat-in {
+                width: 75%;
+                height: 40px;
+                margin-right: 40px;}
+				
+		#add {
+		       height: 30px;
+                background-color: #20c520;
+                border: 0px solid #20c520;
+                color: white;
+                font-size: 20px;}
+		img {
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+		}
+		
+		.text {
+			background-color: grey;
+			width: 100%;
+		}
+
+		</style>
+    </head>
+
+    <body>
+        <div id="message-container">
+
+        </div>
+
+        <input id="chat-in"></input>
+        <button id="add">send</button>
+        
+
+    </body>
+
+
+    
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyAcrUD5uhlB7yuaDB3bNNBFc5zHruTXmA0",
+            authDomain: "tamkeen-database-starter.firebaseapp.com",
+            databaseURL: "https://tamkeen-database-starter.firebaseio.com",
+            projectId: "tamkeen-database-starter",
+            storageBucket: "tamkeen-database-starter.appspot.com",
+            messagingSenderId: "265951754171"
+        };
+        firebase.initializeApp(config);
+        var db = firebase.firestore();
+        function addChat(chatData) {
+            console.log(chatData);
+            var chatHtml = "<div class='message'>";
+			chatHtml = chatHtml + "<img src ="+ chatData.user.picture+"></img>";
+			chatHtml = chatHtml + "<div class='text'>";
+            chatHtml = chatHtml + chatData.user.name + ": "+chatData.message;
+			chatHtml = chatHtml + "</div>";
+            chatHtml = chatHtml + "</div>";
+          			
+			$("#message-container").append(chatHtml);
+        }
+        function handleDataRead(chats) {
+            $(".message").remove();
+            var i = 0;
+            while(i < chats.size) {
+                var data = chats.docs[i].data();
+                addChat(data);
+                i  = i + 1;
+            }
+        }
+        function addMessage() {
+            var text = $("#chat-in").val();
+            var object = {message: text, time: new Date(), user: {name: "mohamed", picture: "https://scontent.faly3-2.fna.fbcdn.net/v/t1.0-9/24232971_813584362145682_6723052062393071481_n.jpg?_nc_cat=0&oh=fbb842e3cad8350d8c071560dc382b45&oe=5B5E325C"}};
+            db.collection("chats").add(object);
+            $("#chat-in").val("");
+            $("#chat-in").focus("");
+        }
+        db.collection("chats").orderBy("time", "desc").onSnapshot(handleDataRead);
+        $("#add").click(addMessage);
+    </script>
+</html>
